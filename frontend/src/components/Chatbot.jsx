@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { MessageSquare, X, Send } from 'lucide-react';
+import { MessageSquare, X, Send, KeyRound } from 'lucide-react';
 
 const SYSTEM_PROMPT = `You are a helpful, kind, student-friendly Class 10 Maths and Science tutor. Explain clearly with examples and step-by-step thought process. Keep answers concise but supportive. Always remind students that "Practice makes perfect" and include one short learning tip.`;
 
@@ -21,14 +21,23 @@ const Chatbot = () => {
   const [draft, setDraft] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [apiKey, setApiKey] = useState('');
+  const [incomingKey, setIncomingKey] = useState('');
+  const [keySaved, setKeySaved] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
     const key = getGroqApiKey();
-    setApiKey(key);
+    if (key) {
+      setApiKey(key);
+      setKeySaved(true);
+    }
   }, []);
 
-  const canSend = useMemo(() => draft.trim().length > 0 && !isTyping && apiKey.trim().length > 0, [draft, isTyping, apiKey]);
+  const canSend = useMemo(
+    () => draft.trim().length > 0 && !isTyping && apiKey.trim().length > 0,
+    [draft, isTyping, apiKey]
+  );
+
 
   const addMessage = (msg) => setMessages((prev) => [...prev, msg]);
 
@@ -94,6 +103,18 @@ const Chatbot = () => {
     }
   };
 
+  const saveKey = () => {
+    const key = incomingKey.trim();
+    if (!key) {
+      setError('Please enter a valid Groq API key.');
+      return;
+    }
+    setApiKey(key);
+    setKeySaved(true);
+    setIncomingKey('');
+    setError('Groq API key saved locally for session.');
+  };
+
   return (
     <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end">
       <div
@@ -122,6 +143,26 @@ const Chatbot = () => {
             Tip: Ask questions like "Explain photosynthesis with a diagram idea" or "Solve 12x-3=21 step-by-step".
           </div>
 
+          {!keySaved && (
+            <div className="space-y-2 bg-white p-2 rounded-lg border border-amber-200">
+              <div className="flex items-center gap-2 text-xs text-amber-900 font-semibold">
+                <KeyRound size={14} /> Enter your Groq API key
+              </div>
+              <input
+                type="password"
+                value={incomingKey}
+                onChange={(e) => { setIncomingKey(e.target.value); setError(''); }}
+                placeholder="Paste Groq API key"
+                className="w-full rounded-lg border border-amber-200 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-amber-300"
+              />
+              <button
+                onClick={saveKey}
+                className="w-full rounded-lg bg-amber-500 text-white text-sm py-1 hover:bg-amber-600 transition"
+              >
+                Save Key for Session
+              </button>
+            </div>
+          )}
 
           <div className="space-y-2">
             {messages.map((msg) => {

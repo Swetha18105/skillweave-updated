@@ -3,6 +3,7 @@ import "@/App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Toaster } from "@/components/ui/sonner";
 import Navbar from "./components/Navbar";
+import Chatbot from "./components/Chatbot";
 import HomePage from "./pages/HomePage";
 import DashboardPage from "./pages/DashboardPage";
 import QuizPage from "./pages/QuizPage";
@@ -23,6 +24,7 @@ function App() {
           <Route path="/learning" element={<LearningContentPage />} />
           <Route path="/analytics" element={<AnalyticsPage />} />
         </Routes>
+        <Chatbot />
         <Toaster />
       </BrowserRouter>
     </div>
